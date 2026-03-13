@@ -89,12 +89,12 @@ def documents_tab(vehicle_id: int) -> None:
                     return
                 on_save({
                     'vehicle_id':    vehicle_id,
-                    'policy_number': policy.value.strip()  or None,
-                    'company':       company.value.strip() or None,
+                    'policy_number': (policy.value or "").strip()  or None,
+                    'company':       (company.value or "").strip() or None,
                     'date_from':     d_from.value or None,
                     'date_to':       d_to.value   or None,
                     'cost':          cost.value   or 0,
-                    'notes':         notes.value.strip() or None,
+                    'notes':         (notes.value or "").strip() or None,
                 })
                 dialog.close()
 
@@ -189,7 +189,7 @@ def documents_tab(vehicle_id: int) -> None:
                     'date':        insp_date.value   or None,
                     'valid_until': valid_until.value or None,
                     'cost':        cost.value        or 0,
-                    'notes':       notes.value.strip() or None,
+                    'notes':       (notes.value or "").strip() or None,
                 })
                 dialog.close()
 

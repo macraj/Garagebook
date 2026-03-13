@@ -161,8 +161,8 @@ def entries_tab(vehicle_id: int) -> None:
                     'quantity':    quantity.value or 0,
                     'amount':      amount.value or 0,
                     'odometer':    int(odometer.value) if odometer.value else None,
-                    'description': description.value.strip() or None,
-                    'user_code':   user_code.value.strip() or None,
+                    'description': (description.value or "").strip() or None,
+                    'user_code':   (user_code.value or "").strip() or None,
                     'full_tank':   1 if (category.value == 'Paliwo' and full_tank.value) else 0,
                 }
                 on_save(data)

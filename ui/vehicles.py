@@ -86,14 +86,14 @@ def vehicles_page() -> None:
                         .classes('text-caption text-grey-5')
 
             def save():
-                if not name.value.strip():
+                if not (name.value or "").strip():
                     ui.notify('Nazwa jest wymagana', type='warning')
                     return
                 data = {
-                    'name': name.value.strip(),
-                    'make': make.value.strip() or None,
-                    'model': model.value.strip() or None,
-                    'vin': vin.value.strip() or None,
+                    'name': (name.value or "").strip(),
+                    'make': (make.value or "").strip() or None,
+                    'model': (model.value or "").strip() or None,
+                    'vin': (vin.value or "").strip() or None,
                     'year': int(year.value) if year.value else None,
                     'fuel_type': fuel.value,
                     'first_registration_date': reg_date.value or None,
