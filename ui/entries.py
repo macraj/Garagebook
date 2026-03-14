@@ -117,10 +117,10 @@ def entries_tab(vehicle_id: int) -> None:
                     min=0, precision=0,
                 ).classes('w-full')
 
-                description = ui.input(
+                description = ui.textarea(
                     'Opis',
                     value=entry.get('description', '') if is_edit else '',
-                ).classes('w-full')
+                ).classes('w-full').props('rows=3 autogrow')
 
                 user_code = ui.input(
                     'ID kierowcy (np. MR)',

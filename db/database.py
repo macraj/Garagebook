@@ -251,6 +251,42 @@ def get_cost_summary(vehicle_id: int) -> list[dict]:
         return [dict(r) for r in rows]
 
 
+def get_vehicle_stats(vehicle_id: int) -> dict:
+    """Łączne koszty, przebieg i koszt na km dla pojazdu."""
+    with get_connection() as conn:
+        vrow = conn.execute(
+            'SELECT initial_odometer FROM vehicles WHERE id = ?', (vehicle_id,)
+        ).fetchone()
+        initial_odo = (vrow['initial_odometer'] or 0) if vrow else 0
+
+        odo_row = conn.execute(
+            '''SELECT MIN(odometer) AS min_odo, MAX(odometer) AS max_odo
+               FROM cost_entries WHERE vehicle_id = ? AND odometer IS NOT NULL''',
+            (vehicle_id,),
+        ).fetchone()
+        min_odo = odo_row['min_odo'] if odo_row else None
+        max_odo = odo_row['max_odo'] if odo_row else None
+
+        start_odo = min(filter(None, [initial_odo or None, min_odo])) if any([initial_odo, min_odo]) else None
+
+        total_row = conn.execute(
+            'SELECT SUM(amount) AS total FROM cost_entries WHERE vehicle_id = ?',
+            (vehicle_id,),
+        ).fetchone()
+        total_cost = total_row['total'] or 0.0
+
+        total_km = (max_odo - start_odo) if (max_odo and start_odo is not None and max_odo > start_odo) else None
+        cost_per_km = round(total_cost / total_km, 2) if total_km else None
+
+        return {
+            'total_cost':   total_cost,
+            'start_odo':    start_odo,
+            'end_odo':      max_odo,
+            'total_km':     total_km,
+            'cost_per_km':  cost_per_km,
+        }
+
+
 def get_max_odometer(vehicle_id: int, exclude_entry_id: int | None = None) -> int:
     """Najwyższy zarejestrowany licznik (uwzględnia initial_odometer pojazdu)."""
     with get_connection() as conn:
