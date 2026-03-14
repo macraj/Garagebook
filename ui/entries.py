@@ -2,7 +2,7 @@ from datetime import date
 from nicegui import ui
 from db import database as db
 
-CATEGORIES = ['Paliwo', 'Części', 'Obsługa', 'Usterka', 'Serwis']
+CATEGORIES = ['Paliwo', 'Ładowanie', 'Części', 'Obsługa', 'Usterka', 'Serwis']
 
 
 def entries_tab(vehicle_id: int) -> None:
@@ -23,7 +23,8 @@ def entries_tab(vehicle_id: int) -> None:
 
         # Summary cards
         total_amount = sum(e.get('amount') or 0 for e in entries)
-        total_fuel_l = sum(e.get('quantity') or 0 for e in entries if e['category'] == 'Paliwo')
+        total_fuel_l   = sum(e.get('quantity') or 0 for e in entries if e['category'] == 'Paliwo')
+        total_charge_kwh = sum(e.get('quantity') or 0 for e in entries if e['category'] == 'Ładowanie')
 
         with ui.row().classes('gap-3 q-mb-md flex-wrap'):
             with ui.card().classes('bg-blue-50 q-pa-sm'):
@@ -33,6 +34,10 @@ def entries_tab(vehicle_id: int) -> None:
                 with ui.card().classes('bg-green-50 q-pa-sm'):
                     ui.label(f'{total_fuel_l:.2f} L').classes('text-h6 text-green-900')
                     ui.label('Łącznie paliwo').classes('text-caption text-grey-6')
+            if total_charge_kwh > 0:
+                with ui.card().classes('bg-purple-50 q-pa-sm'):
+                    ui.label(f'{total_charge_kwh:.2f} kWh').classes('text-h6 text-purple-900')
+                    ui.label('Łącznie ładowanie').classes('text-caption text-grey-6')
             ui.label(f'{len(entries)} wpisów').classes('text-caption text-grey-5 self-end q-pb-xs')
 
         if not entries:
@@ -70,8 +75,8 @@ def entries_tab(vehicle_id: int) -> None:
 
         table.add_slot('body-cell-category', '''
             <q-td :props="props">
-                <q-badge :color="{'Paliwo':'green','Części':'blue','Obsługa':'teal',
-                                   'Usterka':'red','Serwis':'orange'}[props.value] || 'grey'"
+                <q-badge :color="{'Paliwo':'green','Ładowanie':'deep-purple','Części':'blue',
+                                   'Obsługa':'teal','Usterka':'red','Serwis':'orange'}[props.value] || 'grey'"
                          :label="props.value" />
             </q-td>
         ''')
@@ -104,7 +109,7 @@ def entries_tab(vehicle_id: int) -> None:
 
                 with ui.row().classes('w-full gap-2'):
                     quantity = ui.number(
-                        'Ilość (L / szt)',
+                        'Ilość',
                         value=entry.get('quantity') if is_edit else None,
                         min=0, format='%.3f',
                     ).classes('flex-1')
@@ -133,7 +138,7 @@ def entries_tab(vehicle_id: int) -> None:
                 full_tank_row = ui.row().classes('items-center')
                 with full_tank_row:
                     full_tank = ui.checkbox(
-                        'Tankowanie do pełna',
+                        'Do pełna',
                         value=bool(entry.get('full_tank')) if is_edit else False,
                     )
 
@@ -144,12 +149,20 @@ def entries_tab(vehicle_id: int) -> None:
                         value=bool(entry.get('oil_change')) if is_edit else False,
                     )
 
-                def _update_checkboxes():
-                    full_tank_row.set_visibility(category.value == 'Paliwo')
-                    oil_change_row.set_visibility(category.value != 'Paliwo')
+                def _update_ui():
+                    is_fuel   = category.value == 'Paliwo'
+                    is_charge = category.value == 'Ładowanie'
+                    full_tank_row.set_visibility(is_fuel or is_charge)
+                    oil_change_row.set_visibility(not is_fuel and not is_charge)
+                    if is_fuel:
+                        quantity.props('label="Ilość (L)"')
+                    elif is_charge:
+                        quantity.props('label="Ilość (kWh)"')
+                    else:
+                        quantity.props('label="Ilość (szt)"')
 
-                category.on_value_change(lambda _: _update_checkboxes())
-                _update_checkboxes()
+                category.on_value_change(lambda _: _update_ui())
+                _update_ui()
 
             def save():
                 if not date_in.value:
@@ -173,8 +186,8 @@ def entries_tab(vehicle_id: int) -> None:
                     'odometer':    int(odometer.value) if odometer.value else None,
                     'description': (description.value or "").strip() or None,
                     'user_code':   (user_code.value or "").strip() or None,
-                    'full_tank':   1 if (category.value == 'Paliwo' and full_tank.value) else 0,
-                    'oil_change':  1 if (category.value != 'Paliwo' and oil_change.value) else 0,
+                    'full_tank':   1 if (category.value in ('Paliwo', 'Ładowanie') and full_tank.value) else 0,
+                    'oil_change':  1 if (category.value not in ('Paliwo', 'Ładowanie') and oil_change.value) else 0,
                 }
                 on_save(data)
                 dialog.close()
@@ -217,7 +230,7 @@ def entries_tab(vehicle_id: int) -> None:
 
     # Filter bar
     with ui.row().classes('items-end gap-3 q-mb-md flex-wrap'):
-        cat_filter  = ui.select([''] + CATEGORIES, label='Kategoria', value='').classes('w-36')
+        cat_filter  = ui.select([''] + CATEGORIES, label='Kategoria', value='').classes('w-40')
         date_from   = ui.input('Od', placeholder='YYYY-MM-DD').props('type=date').classes('w-36')
         date_to     = ui.input('Do', placeholder='YYYY-MM-DD').props('type=date').classes('w-36')
 

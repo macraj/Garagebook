@@ -258,8 +258,8 @@ def get_last_oil_change(vehicle_id: int) -> dict | None:
     return result
 
 
-def get_fuel_stats(vehicle_id: int) -> list[dict]:
-    """Full-tank fuel entries with L/100km consumption via window function."""
+def get_fuel_stats(vehicle_id: int, category: str = 'Paliwo') -> list[dict]:
+    """Full-tank/full-charge entries with consumption per 100 km via window function."""
     with get_connection() as conn:
         rows = conn.execute(
             '''WITH ranked AS (
@@ -267,7 +267,7 @@ def get_fuel_stats(vehicle_id: int) -> list[dict]:
                           LAG(odometer) OVER (ORDER BY odometer ASC) AS prev_odometer
                    FROM cost_entries
                    WHERE vehicle_id = ?
-                     AND category = 'Paliwo'
+                     AND category = ?
                      AND full_tank = 1
                      AND odometer IS NOT NULL
                )
@@ -275,13 +275,13 @@ def get_fuel_stats(vehicle_id: int) -> list[dict]:
                    id, date, quantity, odometer, amount,
                    CASE WHEN prev_odometer IS NOT NULL AND odometer > prev_odometer
                         THEN ROUND(CAST(quantity AS REAL) / (odometer - prev_odometer) * 100, 2)
-                        ELSE NULL END AS consumption_l100km,
+                        ELSE NULL END AS consumption_per_100km,
                    CASE WHEN prev_odometer IS NOT NULL
                         THEN odometer - prev_odometer
                         ELSE NULL END AS distance_km
                FROM ranked
                ORDER BY odometer DESC''',
-            (vehicle_id,),
+            (vehicle_id, category),
         ).fetchall()
         return [dict(r) for r in rows]
 
