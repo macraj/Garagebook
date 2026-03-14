@@ -144,10 +144,9 @@ def entries_tab(vehicle_id: int) -> None:
                 if not date_in.value:
                     ui.notify('Data jest wymagana', type='warning')
                     return
-                if odometer.value:
+                if odometer.value and not is_edit:
                     new_odo = int(odometer.value)
-                    exclude_id = entry.get('id') if is_edit else None
-                    max_odo = db.get_max_odometer(vehicle_id, exclude_id)
+                    max_odo = db.get_max_odometer(vehicle_id)
                     if new_odo < max_odo:
                         ui.notify(
                             f'Licznik nie może być niższy od poprzedniego wpisu ({max_odo:,} km)'.replace(',', '\u202f'),
