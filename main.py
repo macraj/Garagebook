@@ -43,6 +43,21 @@ def vehicle_detail(vehicle_id: int) -> None:
         if vehicle.get('first_registration_date'):
             ui.label(f'1. rejestracja: {vehicle["first_registration_date"]}').classes('text-caption text-grey-5')
 
+        # Wskaźnik ostatniej wymiany oleju
+        oil = db.get_last_oil_change(vehicle_id)
+        with ui.row().classes('items-center gap-3 q-mt-xs flex-wrap'):
+            ui.icon('oil_barrel', size='18px').classes('text-grey-5')
+            if oil:
+                ui.label(f'Ostatnia wymiana oleju: {oil["date"]}').classes('text-caption text-grey-7')
+                if oil.get('days_since') is not None:
+                    color = 'text-negative' if oil['days_since'] > 365 else 'text-warning' if oil['days_since'] > 270 else 'text-positive'
+                    ui.label(f'{oil["days_since"]} dni').classes(f'text-caption text-bold {color}')
+                if oil.get('km_since') is not None:
+                    color = 'text-negative' if oil['km_since'] > 15000 else 'text-warning' if oil['km_since'] > 10000 else 'text-positive'
+                    ui.label(f'{oil["km_since"]:,} km'.replace(',', '\u202f')).classes(f'text-caption text-bold {color}')
+            else:
+                ui.label('Brak zarejestrowanej wymiany oleju').classes('text-caption text-grey-4')
+
         ui.separator().classes('q-my-xs')
 
         with ui.tabs().classes('w-full') as tabs:

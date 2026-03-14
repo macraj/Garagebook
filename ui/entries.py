@@ -45,6 +45,7 @@ def entries_tab(vehicle_id: int) -> None:
             {'name': 'amount',      'label': 'Kwota (PLN)',    'field': 'amount_fmt',  'sortable': True, 'align': 'right'},
             {'name': 'odometer',    'label': 'Licznik (km)',   'field': 'odometer_fmt','sortable': True, 'align': 'right'},
             {'name': 'full_tank',   'label': 'Do pełna',       'field': 'full_tank_fmt'},
+            {'name': 'oil_change',  'label': 'Olej',           'field': 'oil_change_fmt'},
             {'name': 'description', 'label': 'Opis',           'field': 'description', 'align': 'left'},
             {'name': 'user_code',   'label': 'ID',             'field': 'user_code'},
             {'name': 'actions',     'label': '',               'field': 'actions'},
@@ -58,6 +59,7 @@ def entries_tab(vehicle_id: int) -> None:
                 'amount_fmt':    f"{e['amount']:.2f}"                  if e.get('amount')    else '—',
                 'odometer_fmt':  f"{e['odometer']:,}".replace(',', '\u202f') if e.get('odometer') else '—',
                 'full_tank_fmt': '✓' if e.get('full_tank') else '',
+                'oil_change_fmt': '🔧' if e.get('oil_change') else '',
             })
 
         table = ui.table(
@@ -134,11 +136,19 @@ def entries_tab(vehicle_id: int) -> None:
                         value=bool(entry.get('full_tank')) if is_edit else False,
                     )
 
-                def _update_full_tank_visibility():
-                    full_tank_row.set_visibility(category.value == 'Paliwo')
+                oil_change_row = ui.row().classes('items-center')
+                with oil_change_row:
+                    oil_change = ui.checkbox(
+                        'Wymiana oleju',
+                        value=bool(entry.get('oil_change')) if is_edit else False,
+                    )
 
-                category.on_value_change(lambda _: _update_full_tank_visibility())
-                _update_full_tank_visibility()
+                def _update_checkboxes():
+                    full_tank_row.set_visibility(category.value == 'Paliwo')
+                    oil_change_row.set_visibility(category.value != 'Paliwo')
+
+                category.on_value_change(lambda _: _update_checkboxes())
+                _update_checkboxes()
 
             def save():
                 if not date_in.value:
@@ -163,6 +173,7 @@ def entries_tab(vehicle_id: int) -> None:
                     'description': (description.value or "").strip() or None,
                     'user_code':   (user_code.value or "").strip() or None,
                     'full_tank':   1 if (category.value == 'Paliwo' and full_tank.value) else 0,
+                    'oil_change':  1 if (category.value != 'Paliwo' and oil_change.value) else 0,
                 }
                 on_save(data)
                 dialog.close()

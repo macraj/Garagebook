@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS cost_entries (
     description TEXT,
     user_code   TEXT,
     full_tank   INTEGER DEFAULT 0,
+    oil_change  INTEGER DEFAULT 0,
     created_at  TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
 );

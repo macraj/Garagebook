@@ -23,6 +23,7 @@ def _migrate(conn: sqlite3.Connection) -> None:
     """Dodaje kolumny dodane po pierwszym uruchomieniu — bezpieczne przy ponownym init."""
     for sql in [
         'ALTER TABLE vehicles ADD COLUMN initial_odometer INTEGER',
+        'ALTER TABLE cost_entries ADD COLUMN oil_change INTEGER DEFAULT 0',
     ]:
         try:
             conn.execute(sql)
@@ -189,8 +190,8 @@ def create_entry(data: dict) -> int:
     with get_connection() as conn:
         cur = conn.execute(
             '''INSERT INTO cost_entries
-               (vehicle_id, date, category, quantity, amount, odometer, description, user_code, full_tank)
-               VALUES (:vehicle_id, :date, :category, :quantity, :amount, :odometer, :description, :user_code, :full_tank)''',
+               (vehicle_id, date, category, quantity, amount, odometer, description, user_code, full_tank, oil_change)
+               VALUES (:vehicle_id, :date, :category, :quantity, :amount, :odometer, :description, :user_code, :full_tank, :oil_change)''',
             data,
         )
         return cur.lastrowid
@@ -201,7 +202,8 @@ def update_entry(entry_id: int, data: dict) -> None:
         conn.execute(
             '''UPDATE cost_entries
                SET date=:date, category=:category, quantity=:quantity, amount=:amount,
-                   odometer=:odometer, description=:description, user_code=:user_code, full_tank=:full_tank
+                   odometer=:odometer, description=:description, user_code=:user_code,
+                   full_tank=:full_tank, oil_change=:oil_change
                WHERE id=:id''',
             {**data, 'id': entry_id},
         )
@@ -210,6 +212,28 @@ def update_entry(entry_id: int, data: dict) -> None:
 def delete_entry(entry_id: int) -> None:
     with get_connection() as conn:
         conn.execute('DELETE FROM cost_entries WHERE id = ?', (entry_id,))
+
+
+def get_last_oil_change(vehicle_id: int) -> dict | None:
+    """Ostatnia wymiana oleju — data, licznik, ile dni i km minęło."""
+    with get_connection() as conn:
+        row = conn.execute(
+            '''SELECT date, odometer FROM cost_entries
+               WHERE vehicle_id = ? AND oil_change = 1
+               ORDER BY date DESC, id DESC LIMIT 1''',
+            (vehicle_id,),
+        ).fetchone()
+    if not row:
+        return None
+    result = dict(row)
+    try:
+        d = date_type.fromisoformat(row['date'])
+        result['days_since'] = (date_type.today() - d).days
+    except ValueError:
+        result['days_since'] = None
+    max_odo = get_max_odometer(vehicle_id)
+    result['km_since'] = (max_odo - row['odometer']) if (max_odo and row['odometer'] is not None) else None
+    return result
 
 
 def get_fuel_stats(vehicle_id: int) -> list[dict]:
