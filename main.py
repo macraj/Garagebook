@@ -105,8 +105,17 @@ def _fuel_stats_tab(vehicle_id: int) -> None:
                     ui.label(f'{vstats["cost_per_km"]:.2f} PLN/km').classes('text-h6 text-teal-900')
                     ui.label('Średni koszt / km').classes('text-caption text-grey-6')
 
+            if vstats['cost_insurance']:
+                with ui.card().classes('bg-cyan-50 q-pa-sm'):
+                    ui.label(f'{vstats["cost_insurance"]:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6 text-cyan-900')
+                    ui.label('Ubezpieczenia').classes('text-caption text-grey-6')
+
+            if vstats['cost_inspection']:
+                with ui.card().classes('bg-lime-50 q-pa-sm'):
+                    ui.label(f'{vstats["cost_inspection"]:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6 text-lime-900')
+                    ui.label('Przeglądy techniczne').classes('text-caption text-grey-6')
+
             for s in summary:
-                colors = {'Paliwo': 'green', 'Części': 'blue', 'Obsługa': 'teal', 'Usterka': 'red', 'Serwis': 'orange'}
                 bg = {'Paliwo': 'bg-green-50', 'Części': 'bg-blue-50', 'Obsługa': 'bg-teal-50',
                       'Usterka': 'bg-red-50', 'Serwis': 'bg-orange-50'}.get(s['category'], 'bg-grey-1')
                 with ui.card().classes(f'{bg} q-pa-sm'):

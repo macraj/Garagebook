@@ -293,21 +293,38 @@ def get_vehicle_stats(vehicle_id: int) -> dict:
 
         start_odo = min(filter(None, [initial_odo or None, min_odo])) if any([initial_odo, min_odo]) else None
 
-        total_row = conn.execute(
+        entries_row = conn.execute(
             'SELECT SUM(amount) AS total FROM cost_entries WHERE vehicle_id = ?',
             (vehicle_id,),
         ).fetchone()
-        total_cost = total_row['total'] or 0.0
+        insurance_row = conn.execute(
+            'SELECT SUM(cost) AS total FROM insurance WHERE vehicle_id = ?',
+            (vehicle_id,),
+        ).fetchone()
+        inspection_row = conn.execute(
+            'SELECT SUM(cost) AS total FROM technical_inspection WHERE vehicle_id = ?',
+            (vehicle_id,),
+        ).fetchone()
+
+        total_cost = (
+            (entries_row['total']    or 0.0) +
+            (insurance_row['total']  or 0.0) +
+            (inspection_row['total'] or 0.0)
+        )
+        cost_insurance  = insurance_row['total']  or 0.0
+        cost_inspection = inspection_row['total'] or 0.0
 
         total_km = (max_odo - start_odo) if (max_odo and start_odo is not None and max_odo > start_odo) else None
         cost_per_km = round(total_cost / total_km, 2) if total_km else None
 
         return {
-            'total_cost':   total_cost,
-            'start_odo':    start_odo,
-            'end_odo':      max_odo,
-            'total_km':     total_km,
-            'cost_per_km':  cost_per_km,
+            'total_cost':       total_cost,
+            'cost_insurance':   cost_insurance,
+            'cost_inspection':  cost_inspection,
+            'start_odo':        start_odo,
+            'end_odo':          max_odo,
+            'total_km':         total_km,
+            'cost_per_km':      cost_per_km,
         }
 
 
