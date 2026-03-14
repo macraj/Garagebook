@@ -5,6 +5,11 @@ from datetime import date as date_type
 DB_PATH = Path('garagebook.db')
 SCHEMA_PATH = Path(__file__).parent / 'schema.sql'
 
+CURRENCY_SYMBOLS: dict[str, str] = {
+    'PLN': 'zł', 'EUR': '€', 'USD': '$', 'GBP': '£',
+    'CHF': 'CHF', 'CZK': 'Kč', 'NOK': 'kr', 'SEK': 'kr',
+}
+
 
 def get_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
@@ -39,6 +44,23 @@ def days_until(date_str: str | None) -> int | None:
         return (d - date_type.today()).days
     except ValueError:
         return None
+
+
+# ─── Settings ───────────────────────────────────────────────────────────────
+
+def get_setting(key: str, default: str = '') -> str:
+    with get_connection() as conn:
+        row = conn.execute('SELECT value FROM settings WHERE key = ?', (key,)).fetchone()
+        return row['value'] if row else default
+
+
+def set_setting(key: str, value: str) -> None:
+    with get_connection() as conn:
+        conn.execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', (key, value))
+
+
+def get_currency_symbol() -> str:
+    return CURRENCY_SYMBOLS.get(get_setting('currency', 'PLN'), 'zł')
 
 
 # ─── Vehicles ───────────────────────────────────────────────────────────────

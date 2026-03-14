@@ -16,12 +16,13 @@ Przy pierwszym uruchomieniu zostaje automatycznie utworzona baza danych `garageb
 
 ## Nawigacja
 
-Pasek u góry ekranu zawiera dwa przyciski:
+Pasek u góry ekranu zawiera przyciski:
 
 | Przycisk | Opis |
 |---|---|
 | **Dashboard** | Widok główny — przegląd całej floty |
 | **Pojazdy** | Zarządzanie listą pojazdów |
+| **Ustawienia** | Waluta, kopia zapasowa bazy danych |
 
 Kliknięcie karty pojazdu na dashboardzie otwiera szczegóły pojazdu.
 
@@ -227,7 +228,36 @@ Przy nowym wpisie licznik nie może być niższy od dotychczasowego maksimum. Sp
 Użyj strzałek `‹` `›` do nawigacji po miesiącach lub kliknij nagłówek z miesiącem/rokiem w kalendarzu, aby przejść do widoku wyboru roku.
 
 **Gdzie jest baza danych?**
-Plik `garagebook.db` w katalogu aplikacji. Można go skopiować jako kopię zapasową.
+Plik `garagebook.db` w katalogu aplikacji. Użyj funkcji kopii zapasowej w Ustawieniach lub skopiuj plik ręcznie.
+
+---
+
+## Ustawienia
+
+Strona dostępna przez przycisk **Ustawienia** w pasku nawigacji.
+
+### Waluta
+
+Wybierz walutę wyświetlaną przy kwotach w całej aplikacji:
+
+| Waluta | Symbol |
+|---|---|
+| PLN — złoty polski | zł |
+| EUR — euro | € |
+| USD — dolar amerykański | $ |
+| GBP — funt brytyjski | £ |
+| CHF — frank szwajcarski | CHF |
+| CZK — korona czeska | Kč |
+| NOK — korona norweska | kr |
+| SEK — korona szwedzka | kr |
+
+Po wybraniu waluty kliknij **Zapisz ustawienia**.
+
+### Kopia zapasowa
+
+Przycisk **Pobierz kopię zapasową** pobiera plik `garagebook_backup_YYYY-MM-DD_HH-MM-SS.db`.
+
+Aby przywrócić dane z kopii: zastąp plik `garagebook.db` w katalogu aplikacji pobraną kopią (przed uruchomieniem aplikacji).
 
 ---
 
@@ -235,17 +265,26 @@ Plik `garagebook.db` w katalogu aplikacji. Można go skopiować jako kopię zapa
 
 ```
 Garagebook/
-├── main.py          — uruchomienie aplikacji, strona pojazdu
-├── start.sh         — skrypt startowy
-├── requirements.txt — zależności Python
+├── main.py              — uruchomienie aplikacji, strona pojazdu
+├── Garagebook.command   — launcher macOS
+├── Garagebook.sh        — launcher Linux
+├── Garagebook.bat       — launcher Windows
+├── start.sh             — skrypt startowy (tryb deweloperski)
+├── requirements.txt     — zależności Python
+├── INSTALACJA.txt       — instrukcja instalacji
+├── scripts/
+│   ├── macos/install.sh
+│   ├── linux/install.sh
+│   └── windows/install.bat
 ├── db/
-│   ├── schema.sql   — schemat bazy danych
-│   └── database.py  — wszystkie operacje na bazie
+│   ├── schema.sql       — schemat bazy danych
+│   └── database.py      — wszystkie operacje na bazie
 └── ui/
-    ├── dashboard.py — widok główny
-    ├── vehicles.py  — zarządzanie pojazdami
-    ├── entries.py   — wpisy kosztów
-    ├── documents.py — ubezpieczenia i przeglądy
-    ├── export.py    — eksport CSV
-    └── layout.py    — wspólny nagłówek i kolory alertów
+    ├── dashboard.py     — widok główny
+    ├── vehicles.py      — zarządzanie pojazdami
+    ├── entries.py       — wpisy kosztów
+    ├── documents.py     — ubezpieczenia i przeglądy
+    ├── settings.py      — ustawienia i kopia zapasowa
+    ├── export.py        — eksport CSV
+    └── layout.py        — wspólny nagłówek i kolory alertów
 ```

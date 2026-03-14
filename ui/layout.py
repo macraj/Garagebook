@@ -30,3 +30,4 @@ def page_header(title: str = '') -> None:
         ui.space()
         ui.link('Dashboard', '/').classes('text-white text-body2 no-underline')
         ui.link('Pojazdy', '/pojazdy').classes('text-white text-body2 no-underline')
+        ui.link('Ustawienia', '/ustawienia').classes('text-white text-body2 no-underline')

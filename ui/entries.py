@@ -11,6 +11,7 @@ def entries_tab(vehicle_id: int) -> None:
 
     @ui.refreshable
     def entries_content() -> None:
+        cur = db.get_currency_symbol()
         entries = db.get_vehicle_entries(
             vehicle_id,
             filter_state['category'],
@@ -26,7 +27,7 @@ def entries_tab(vehicle_id: int) -> None:
 
         with ui.row().classes('gap-3 q-mb-md flex-wrap'):
             with ui.card().classes('bg-blue-50 q-pa-sm'):
-                ui.label(f'{total_amount:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6 text-blue-900')
+                ui.label(f'{total_amount:,.2f} {cur}'.replace(',', '\u202f')).classes('text-h6 text-blue-900')
                 ui.label('Łączny koszt').classes('text-caption text-grey-6')
             if total_fuel_l > 0:
                 with ui.card().classes('bg-green-50 q-pa-sm'):
@@ -42,7 +43,7 @@ def entries_tab(vehicle_id: int) -> None:
             {'name': 'date',        'label': 'Data',          'field': 'date',        'sortable': True, 'align': 'left'},
             {'name': 'category',    'label': 'Rodzaj',         'field': 'category',    'sortable': True, 'align': 'left'},
             {'name': 'quantity',    'label': 'Ilość',          'field': 'quantity_fmt','align': 'right'},
-            {'name': 'amount',      'label': 'Kwota (PLN)',    'field': 'amount_fmt',  'sortable': True, 'align': 'right'},
+            {'name': 'amount',      'label': f'Kwota ({cur})', 'field': 'amount_fmt',  'sortable': True, 'align': 'right'},
             {'name': 'odometer',    'label': 'Licznik (km)',   'field': 'odometer_fmt','sortable': True, 'align': 'right'},
             {'name': 'full_tank',   'label': 'Do pełna',       'field': 'full_tank_fmt'},
             {'name': 'oil_change',  'label': 'Olej',           'field': 'oil_change_fmt'},
@@ -108,7 +109,7 @@ def entries_tab(vehicle_id: int) -> None:
                         min=0, format='%.3f',
                     ).classes('flex-1')
                     amount = ui.number(
-                        'Kwota (PLN)',
+                        f'Kwota ({db.get_currency_symbol()})',
                         value=entry.get('amount') if is_edit else None,
                         min=0, format='%.2f',
                     ).classes('flex-1')

@@ -58,7 +58,7 @@ def documents_tab(vehicle_id: int) -> None:
                         f'{r.get("date_from") or "?"}  →  {r.get("date_to") or "?"}'
                     ).classes('text-caption text-grey-7')
                     if r.get('cost'):
-                        ui.label(f'Koszt: {r["cost"]:.2f} PLN').classes('text-caption text-grey-6')
+                        ui.label(f'Koszt: {r["cost"]:.2f} {db.get_currency_symbol()}').classes('text-caption text-grey-6')
                     if r.get('notes'):
                         ui.label(r['notes']).classes('text-caption text-grey-5')
                 with ui.row().classes('items-center gap-2 no-wrap'):
@@ -80,7 +80,7 @@ def documents_tab(vehicle_id: int) -> None:
                     d_from.classes('flex-1')
                     d_to   = _date_picker('Ważne do',   value=default_to)
                     d_to.classes('flex-1')
-                cost  = ui.number('Koszt (PLN)', value=record.get('cost', 0) if is_edit else 0, min=0, format='%.2f').classes('w-full')
+                cost  = ui.number(f'Koszt ({db.get_currency_symbol()})', value=record.get('cost', 0) if is_edit else 0, min=0, format='%.2f').classes('w-full')
                 notes = ui.input('Uwagi',        value=record.get('notes', '') if is_edit else '').classes('w-full')
 
             def save():
@@ -157,7 +157,7 @@ def documents_tab(vehicle_id: int) -> None:
                         f'Data przeglądu: {r.get("date") or "?"}  ·  Ważny do: {r.get("valid_until") or "?"}'
                     ).classes('text-body1 text-bold')
                     if r.get('cost'):
-                        ui.label(f'Koszt: {r["cost"]:.2f} PLN').classes('text-caption text-grey-6')
+                        ui.label(f'Koszt: {r["cost"]:.2f} {db.get_currency_symbol()}').classes('text-caption text-grey-6')
                     if r.get('notes'):
                         ui.label(r['notes']).classes('text-caption text-grey-5')
                 with ui.row().classes('items-center gap-2 no-wrap'):
@@ -177,7 +177,7 @@ def documents_tab(vehicle_id: int) -> None:
                     insp_date.classes('flex-1')
                     valid_until = _date_picker('Ważny do', value=default_valid)
                     valid_until.classes('flex-1')
-                cost  = ui.number('Koszt (PLN)', value=record.get('cost', 0) if is_edit else 0, min=0, format='%.2f').classes('w-full')
+                cost  = ui.number(f'Koszt ({db.get_currency_symbol()})', value=record.get('cost', 0) if is_edit else 0, min=0, format='%.2f').classes('w-full')
                 notes = ui.input('Uwagi',        value=record.get('notes', '') if is_edit else '').classes('w-full')
 
             def save():

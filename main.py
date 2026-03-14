@@ -6,6 +6,7 @@ from ui.vehicles import vehicles_page
 from ui.entries import entries_tab
 from ui.documents import documents_tab
 from ui.export import export_csv_button
+from ui.settings import settings_page
 
 
 @ui.page('/')
@@ -16,6 +17,11 @@ def index() -> None:
 @ui.page('/pojazdy')
 def vehicles() -> None:
     vehicles_page()
+
+
+@ui.page('/ustawienia')
+def ustawienia() -> None:
+    settings_page()
 
 
 @ui.page('/pojazd/{vehicle_id}')
@@ -84,6 +90,7 @@ def _fuel_stats_tab(vehicle_id: int) -> None:
     stats    = db.get_fuel_stats(vehicle_id)
     vstats   = db.get_vehicle_stats(vehicle_id)
     summary  = db.get_cost_summary(vehicle_id)
+    cur      = db.get_currency_symbol()
 
     with ui.column().classes('w-full gap-4'):
 
@@ -92,7 +99,7 @@ def _fuel_stats_tab(vehicle_id: int) -> None:
         with ui.row().classes('flex-wrap gap-3'):
             with ui.card().classes('bg-indigo-50 q-pa-sm'):
                 total = vstats['total_cost']
-                ui.label(f'{total:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6 text-indigo-900')
+                ui.label(f'{total:,.2f} {cur}'.replace(',', '\u202f')).classes('text-h6 text-indigo-900')
                 ui.label('Łączne koszty').classes('text-caption text-grey-6')
 
             if vstats.get('total_km'):
@@ -102,24 +109,24 @@ def _fuel_stats_tab(vehicle_id: int) -> None:
 
             if vstats.get('cost_per_km'):
                 with ui.card().classes('bg-teal-50 q-pa-sm'):
-                    ui.label(f'{vstats["cost_per_km"]:.2f} PLN/km').classes('text-h6 text-teal-900')
+                    ui.label(f'{vstats["cost_per_km"]:.2f} {cur}/km').classes('text-h6 text-teal-900')
                     ui.label('Średni koszt / km').classes('text-caption text-grey-6')
 
             if vstats['cost_insurance']:
                 with ui.card().classes('bg-cyan-50 q-pa-sm'):
-                    ui.label(f'{vstats["cost_insurance"]:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6 text-cyan-900')
+                    ui.label(f'{vstats["cost_insurance"]:,.2f} {cur}'.replace(',', '\u202f')).classes('text-h6 text-cyan-900')
                     ui.label('Ubezpieczenia').classes('text-caption text-grey-6')
 
             if vstats['cost_inspection']:
                 with ui.card().classes('bg-lime-50 q-pa-sm'):
-                    ui.label(f'{vstats["cost_inspection"]:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6 text-lime-900')
+                    ui.label(f'{vstats["cost_inspection"]:,.2f} {cur}'.replace(',', '\u202f')).classes('text-h6 text-lime-900')
                     ui.label('Przeglądy techniczne').classes('text-caption text-grey-6')
 
             for s in summary:
                 bg = {'Paliwo': 'bg-green-50', 'Części': 'bg-blue-50', 'Obsługa': 'bg-teal-50',
                       'Usterka': 'bg-red-50', 'Serwis': 'bg-orange-50'}.get(s['category'], 'bg-grey-1')
                 with ui.card().classes(f'{bg} q-pa-sm'):
-                    ui.label(f'{s["total"]:,.2f} PLN'.replace(',', '\u202f')).classes('text-h6')
+                    ui.label(f'{s["total"]:,.2f} {cur}'.replace(',', '\u202f')).classes('text-h6')
                     ui.label(f'{s["category"]} ({s["count"]} wpisów)').classes('text-caption text-grey-6')
 
         ui.separator()
@@ -178,7 +185,7 @@ def _fuel_stats_tab(vehicle_id: int) -> None:
             {'name': 'distance_km',       'label': 'Trasa (km)',   'field': 'distance_km',       'align': 'right'},
             {'name': 'quantity',          'label': 'Litry (L)',    'field': 'quantity',          'align': 'right'},
             {'name': 'consumption_l100km','label': 'L/100km',      'field': 'consumption_l100km','sortable': True, 'align': 'right'},
-            {'name': 'amount',            'label': 'Koszt (PLN)',  'field': 'amount',            'align': 'right'},
+            {'name': 'amount',            'label': f'Koszt ({cur})', 'field': 'amount',           'align': 'right'},
         ]
         rows = []
         for s in stats:

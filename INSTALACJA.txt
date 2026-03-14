@@ -1,0 +1,85 @@
+====================================================
+  Garagebook — Instrukcja instalacji
+====================================================
+
+Wymagania wstępne: Python 3.10 lub nowszy.
+Pobierz ze strony: https://www.python.org/downloads/
+
+
+----------------------------------------------------
+  macOS
+----------------------------------------------------
+
+1. Wypakuj archiwum Garagebook-macos-*.zip
+2. Przejdź do folderu Garagebook
+3. Kliknij dwukrotnie plik: Garagebook.command
+
+   Przy pierwszym uruchomieniu zostanie automatycznie
+   zainstalowane środowisko Python (.venv).
+   Kolejne uruchomienia są natychmiastowe.
+
+   Jeśli macOS zablokuje uruchomienie:
+   - Otwórz Ustawienia systemowe → Prywatność i ochrona
+   - Kliknij "Otwórz mimo to" przy komunikacie o Garagebook
+   Lub w Terminalu:
+     chmod +x Garagebook.command
+     ./Garagebook.command
+
+
+----------------------------------------------------
+  Windows
+----------------------------------------------------
+
+1. Wypakuj archiwum Garagebook-windows-*.zip
+2. Przejdź do folderu Garagebook
+3. Kliknij dwukrotnie plik: Garagebook.bat
+
+   Przy pierwszym uruchomieniu zostanie automatycznie
+   zainstalowane środowisko Python (.venv).
+   Kolejne uruchomienia są natychmiastowe.
+
+   Wymaganie: Python musi być w PATH.
+   Podczas instalacji Pythona zaznacz opcję:
+   "Add Python to PATH"
+
+
+----------------------------------------------------
+  Linux
+----------------------------------------------------
+
+1. Wypakuj archiwum Garagebook-linux-*.zip
+2. Przejdź do folderu Garagebook
+3. W terminalu:
+     bash Garagebook.sh
+
+   Lub nadaj uprawnienia i uruchom bezpośrednio:
+     chmod +x Garagebook.sh
+     ./Garagebook.sh
+
+   Przy pierwszym uruchomieniu skrypt zainstaluje
+   wymagane pakiety systemowe (GTK, WebKit) oraz
+   środowisko Python (.venv).
+   Wymagane sudo do instalacji pakietów systemowych.
+
+   Obsługiwane dystrybucje: Debian/Ubuntu, Fedora/RHEL,
+   Arch Linux. Dla innych dystrybucji zainstaluj ręcznie:
+   python3-gi, gtk3, webkit2gtk
+
+
+----------------------------------------------------
+  Kopia zapasowa
+----------------------------------------------------
+
+Dane aplikacji przechowywane są w pliku:
+  garagebook.db
+
+Aby wykonać kopię zapasową:
+- Uruchom aplikację → Ustawienia → Pobierz kopię zapasową
+  LUB
+- Skopiuj plik garagebook.db w bezpieczne miejsce
+
+Aby przywrócić dane: zastąp garagebook.db kopią zapasową
+przed uruchomieniem aplikacji.
+
+
+====================================================

@@ -35,6 +35,11 @@ CREATE TABLE IF NOT EXISTS technical_inspection (
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS cost_entries (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     vehicle_id  INTEGER NOT NULL,
