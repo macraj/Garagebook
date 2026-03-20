@@ -78,7 +78,8 @@ PLATFORMS = {
 # Pliki wspólne dla wszystkich platform
 COMMON_FILES = [
     'main.py',
-    'requirements.txt',
+    'pyproject.toml',
+    'uv.lock',
     'INSTRUKCJA.md',
     'INSTALACJA.txt',
 ]
@@ -93,7 +94,7 @@ COMMON_TREES = {
 EXCLUDE_NAMES = {
     '.DS_Store', '.gitignore', 'CLAUDE.md', 'garagebook.db',
     '__pycache__', '.git', '.venv', 'dist', 'dev',
-    '.claude',
+    '.claude', '.deps_installed',
 }
 
 

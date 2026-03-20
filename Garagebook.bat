@@ -1,15 +1,12 @@
 @echo off
 cd /d "%~dp0"
 
-if not exist ".venv" (
-    echo Pierwsza instalacja - konfigurowanie srodowiska...
-    call scripts\windows\install.bat
-    if %ERRORLEVEL% neq 0 (
-        echo Instalacja nie powiodla sie.
-        pause
-        exit /b 1
-    )
+where uv >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo Instalowanie menedzera pakietow (uv)...
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    set "PATH=%USERPROFILE%\.local\bin;%PATH%"
 )
 
 echo Uruchamianie Garagebook...
-.venv\Scripts\python main.py
+uv run main.py

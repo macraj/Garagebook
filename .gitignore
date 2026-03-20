@@ -4,3 +4,5 @@ __pycache__/
 *.pyo
 garagebook.db
 .DS_Store
+dist/
+.deps_installed

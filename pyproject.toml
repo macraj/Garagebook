@@ -1,0 +1,13 @@
+[project]
+name = "garagebook"
+version = "1.0.0"
+description = "Aplikacja do śledzenia kosztów pojazdów"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "nicegui>=2.0.0",
+    "pywebview>=5.0.0",
+    "openpyxl>=3.1.0",
+]
+
+[tool.uv]
+environments = ["python_version >= '3.10' and python_version < '3.14'"]

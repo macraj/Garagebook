@@ -5,21 +5,15 @@ echo.
 echo === Instalacja Garagebook (Windows) ===
 echo.
 
-where python >nul 2>&1
+where uv >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo BLAD: Python nie jest zainstalowany lub nie jest w PATH.
-    echo Pobierz ze strony: https://www.python.org/downloads/
-    echo Podczas instalacji zaznacz opcje "Add Python to PATH"
-    pause
-    exit /b 1
+    echo Instalowanie menedzera pakietow (uv)...
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    set "PATH=%USERPROFILE%\.local\bin;%PATH%"
 )
 
-echo Tworzenie srodowiska wirtualnego (.venv)...
-python -m venv .venv
-
-echo Instalowanie zaleznosci Python...
-.venv\Scripts\pip install --upgrade pip -q
-.venv\Scripts\pip install -r requirements.txt
+echo Konfigurowanie srodowiska Python...
+uv sync
 
 echo.
 echo === Instalacja zakonczona pomyslnie! ===

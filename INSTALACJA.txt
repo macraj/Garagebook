@@ -2,8 +2,11 @@
   Garagebook — Instrukcja instalacji
 ====================================================
 
-Wymagania wstępne: Python 3.10 lub nowszy.
-Pobierz ze strony: https://www.python.org/downloads/
+Wymagania wstępne: połączenie z internetem
+(przy pierwszym uruchomieniu).
+
+Menedżer pakietów uv oraz Python 3.13 zostaną
+zainstalowane automatycznie, jeśli nie są dostępne.
 
 
 ----------------------------------------------------
@@ -15,7 +18,7 @@ Pobierz ze strony: https://www.python.org/downloads/
 3. Kliknij dwukrotnie plik: Garagebook.command
 
    Przy pierwszym uruchomieniu zostanie automatycznie
-   zainstalowane środowisko Python (.venv).
+   zainstalowany uv oraz środowisko Python.
    Kolejne uruchomienia są natychmiastowe.
 
    Jeśli macOS zablokuje uruchomienie:
@@ -35,12 +38,8 @@ Pobierz ze strony: https://www.python.org/downloads/
 3. Kliknij dwukrotnie plik: Garagebook.bat
 
    Przy pierwszym uruchomieniu zostanie automatycznie
-   zainstalowane środowisko Python (.venv).
+   zainstalowany uv oraz środowisko Python.
    Kolejne uruchomienia są natychmiastowe.
-
-   Wymaganie: Python musi być w PATH.
-   Podczas instalacji Pythona zaznacz opcję:
-   "Add Python to PATH"
 
 
 ----------------------------------------------------
@@ -58,7 +57,7 @@ Pobierz ze strony: https://www.python.org/downloads/
 
    Przy pierwszym uruchomieniu skrypt zainstaluje
    wymagane pakiety systemowe (GTK, WebKit) oraz
-   środowisko Python (.venv).
+   uv i środowisko Python.
    Wymagane sudo do instalacji pakietów systemowych.
 
    Obsługiwane dystrybucje: Debian/Ubuntu, Fedora/RHEL,
