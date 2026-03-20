@@ -93,7 +93,7 @@ COMMON_TREES = {
 # Pliki i katalogi których NIGDY nie dodajemy
 EXCLUDE_NAMES = {
     '.DS_Store', '.gitignore', 'CLAUDE.md', 'garagebook.db',
-    '__pycache__', '.git', '.venv', 'dist', 'dev',
+    '__pycache__', '.git', '.venv', 'dist', 'dev', 'backups',
     '.claude', '.deps_installed',
 }
 

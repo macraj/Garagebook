@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import date as date_type
 
 DB_PATH = Path('garagebook.db')
+BACKUPS_DIR = Path('backups')
 SCHEMA_PATH = Path(__file__).parent / 'schema.sql'
 
 CURRENCY_SYMBOLS: dict[str, str] = {
@@ -385,3 +386,33 @@ def get_dashboard_data() -> list[dict]:
         v['inspection'] = insp_list[0] if insp_list else None
         v['last_odometer'] = get_last_odometer(vid)
     return vehicles
+
+
+# ─── Backup / Restore ────────────────────────────────────────────────────────
+
+def backup_db() -> Path:
+    from datetime import datetime
+    BACKUPS_DIR.mkdir(exist_ok=True)
+    ts = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    dest = BACKUPS_DIR / f'garagebook_{ts}.db'
+    src = sqlite3.connect(str(DB_PATH))
+    dst = sqlite3.connect(str(dest))
+    src.backup(dst)
+    src.close()
+    dst.close()
+    return dest
+
+
+def list_backups() -> list[Path]:
+    if not BACKUPS_DIR.exists():
+        return []
+    return sorted(BACKUPS_DIR.glob('garagebook_*.db'), reverse=True)
+
+
+def restore_db(backup_path: Path):
+    import shutil
+    shutil.copy2(str(backup_path), str(DB_PATH))
+
+
+def delete_backup(backup_path: Path):
+    backup_path.unlink(missing_ok=True)

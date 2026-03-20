@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 garagebook.db
+backups/
 .DS_Store
 dist/
 .deps_installed

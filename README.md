@@ -23,12 +23,15 @@ Desktopowa aplikacja do śledzenia kosztów eksploatacji pojazdów.
 ## Uruchomienie
 
 ### macOS
+
 Kliknij dwukrotnie `Garagebook.command`
 
 ### Windows
+
 Kliknij dwukrotnie `Garagebook.bat`
 
 ### Linux
+
 ```bash
 bash Garagebook.sh
 ```
