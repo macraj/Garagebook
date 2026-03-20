@@ -38,8 +38,13 @@ zainstalowane automatycznie, jeśli nie są dostępne.
 3. Kliknij dwukrotnie plik: Garagebook.bat
 
    Przy pierwszym uruchomieniu zostanie automatycznie
-   zainstalowany uv oraz środowisko Python.
+   zainstalowany uv, środowisko Python oraz
+   Microsoft Edge WebView2 Runtime (jeśli brak).
    Kolejne uruchomienia są natychmiastowe.
+
+   Jeśli po instalacji widoczne jest puste okno,
+   zainstaluj ręcznie WebView2 Runtime:
+   https://developer.microsoft.com/en-us/microsoft-edge/webview2/
 
 
 ----------------------------------------------------
