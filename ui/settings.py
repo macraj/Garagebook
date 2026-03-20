@@ -1,9 +1,19 @@
 import platform
 import subprocess
+import tomllib
 from pathlib import Path
 from nicegui import ui
 from db import database as db
 from ui.layout import page_header
+
+
+def _get_version() -> str:
+    try:
+        with open(Path('pyproject.toml'), 'rb') as f:
+            data = tomllib.load(f)
+        return data.get('project', {}).get('version', '?')
+    except Exception:
+        return '?'
 
 
 def _reveal_in_files(path: Path):
@@ -134,3 +144,8 @@ def settings_page() -> None:
         ui.label(
             'Aby przywrócić ręcznie: zastąp plik garagebook.db pobraną kopią (przy wyłączonej aplikacji).'
         ).classes('text-caption text-grey-5 q-mt-xs')
+
+        ui.separator().classes('q-my-sm')
+
+        # ── Wersja ──────────────────────────────────────────────────────────
+        ui.label(f'Garagebook v{_get_version()}').classes('text-caption text-grey-4')

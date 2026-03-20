@@ -2,7 +2,7 @@
 
 Desktopowa aplikacja do śledzenia kosztów eksploatacji pojazdów.
 
-**Stack:** Python · NiceGUI · PyWebView · SQLite
+**Stack:** Python 3.13 · NiceGUI · PyWebView · SQLite · uv
 
 ---
 
@@ -15,7 +15,7 @@ Desktopowa aplikacja do śledzenia kosztów eksploatacji pojazdów.
 - Wskaźnik wymiany oleju (dni i km od ostatniej wymiany)
 - Koszt eksploatacji i średni koszt/km
 - Wybór waluty (PLN, EUR, USD, GBP, CHF, CZK, NOK, SEK)
-- Kopia zapasowa bazy danych
+- Kopia zapasowa bazy danych (backup / restore / usuwanie)
 - Eksport wpisów do CSV (Excel)
 
 ---
@@ -36,13 +36,13 @@ Kliknij dwukrotnie `Garagebook.bat`
 bash Garagebook.sh
 ```
 
-Przy pierwszym uruchomieniu instalator automatycznie tworzy środowisko `.venv` i instaluje zależności.
+Przy pierwszym uruchomieniu automatycznie instalowany jest `uv`, Python 3.13 oraz zależności.
 
 ---
 
 ## Wymagania
 
-- Python 3.10+
+- Połączenie z internetem (przy pierwszym uruchomieniu)
 - macOS / Windows / Linux (Debian, Fedora, Arch)
 
 ---
@@ -52,6 +52,8 @@ Przy pierwszym uruchomieniu instalator automatycznie tworzy środowisko `.venv` 
 ```
 Garagebook/
 ├── main.py              # uruchomienie, strona pojazdu
+├── pyproject.toml       # zależności i wersja
+├── uv.lock              # lockfile
 ├── db/
 │   ├── schema.sql       # schemat SQLite
 │   └── database.py      # operacje na bazie
@@ -76,10 +78,10 @@ Garagebook/
 ## Budowanie dystrybucji
 
 ```bash
-python3 dev/build_dist.py macos
-python3 dev/build_dist.py windows
-python3 dev/build_dist.py linux
-python3 dev/build_dist.py all
+uv run dev/build_dist.py macos
+uv run dev/build_dist.py windows
+uv run dev/build_dist.py linux
+uv run dev/build_dist.py all
 ```
 
 Wynik trafia do katalogu `dist/`.

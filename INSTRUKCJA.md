@@ -268,9 +268,24 @@ Po wybraniu waluty kliknij **Zapisz ustawienia**.
 
 ### Kopia zapasowa
 
-Przycisk **Pobierz kopię zapasową** pobiera plik `garagebook_backup_YYYY-MM-DD_HH-MM-SS.db`.
+Backupy przechowywane są w podfolderze `backups/` w katalogu aplikacji.
 
-Aby przywrócić dane z kopii: zastąp plik `garagebook.db` w katalogu aplikacji pobraną kopią (przed uruchomieniem aplikacji).
+| Przycisk | Opis |
+|---|---|
+| **Utwórz backup** | Tworzy kopię bazy danych (`garagebook_YYYY-MM-DD_HH-MM-SS.db`) używając SQLite backup API |
+| **Otwórz folder backupów** | Otwiera folder `backups/` w menedżerze plików |
+
+Na liście backupów przy każdym pliku dostępne są:
+- 🔄 **Przywróć** — nadpisuje bieżącą bazę wybraną kopią (po potwierdzeniu)
+- 🗑️ **Usuń** — kasuje wybrany backup
+
+> ⚠️ Przywracanie nadpisuje bieżące dane — operacji nie można cofnąć.
+
+Alternatywnie: zastąp plik `garagebook.db` w katalogu aplikacji kopią zapasową (przy wyłączonej aplikacji).
+
+### Wersja
+
+Numer wersji aplikacji wyświetlany jest na dole strony Ustawienia.
 
 ---
 
@@ -279,11 +294,12 @@ Aby przywrócić dane z kopii: zastąp plik `garagebook.db` w katalogu aplikacji
 ```
 Garagebook/
 ├── main.py              — uruchomienie aplikacji, strona pojazdu
+├── pyproject.toml       — zależności i wersja aplikacji
+├── uv.lock              — lockfile (reprodukowalność)
 ├── Garagebook.command   — launcher macOS
 ├── Garagebook.sh        — launcher Linux
 ├── Garagebook.bat       — launcher Windows
 ├── start.sh             — skrypt startowy (tryb deweloperski)
-├── requirements.txt     — zależności Python
 ├── INSTALACJA.txt       — instrukcja instalacji
 ├── scripts/
 │   ├── macos/install.sh
@@ -292,12 +308,13 @@ Garagebook/
 ├── db/
 │   ├── schema.sql       — schemat bazy danych
 │   └── database.py      — wszystkie operacje na bazie
-└── ui/
-    ├── dashboard.py     — widok główny
-    ├── vehicles.py      — zarządzanie pojazdami
-    ├── entries.py       — wpisy kosztów
-    ├── documents.py     — ubezpieczenia i przeglądy
-    ├── settings.py      — ustawienia i kopia zapasowa
-    ├── export.py        — eksport CSV
-    └── layout.py        — wspólny nagłówek i kolory alertów
+├── ui/
+│   ├── dashboard.py     — widok główny
+│   ├── vehicles.py      — zarządzanie pojazdami
+│   ├── entries.py       — wpisy kosztów
+│   ├── documents.py     — ubezpieczenia i przeglądy
+│   ├── settings.py      — ustawienia i kopia zapasowa
+│   ├── export.py        — eksport CSV
+│   └── layout.py        — wspólny nagłówek i kolory alertów
+└── backups/             — kopie zapasowe bazy danych
 ```
