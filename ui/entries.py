@@ -5,7 +5,7 @@ from db import database as db
 CATEGORIES = ['Paliwo', 'Ładowanie', 'Części', 'Obsługa', 'Usterka', 'Serwis']
 
 
-def entries_tab(vehicle_id: int) -> None:
+def entries_tab(vehicle_id: int, on_change=None) -> None:
     filter_state = {'category': '', 'date_from': '', 'date_to': ''}
     raw_cache: list[dict] = []
 
@@ -198,11 +198,16 @@ def entries_tab(vehicle_id: int) -> None:
 
         return dialog
 
+    def _refresh_all():
+        entries_content.refresh()
+        if on_change:
+            on_change()
+
     def _open_add():
         def save(data):
             db.create_entry(data)
             ui.notify('Wpis dodany', type='positive')
-            entries_content.refresh()
+            _refresh_all()
         _entry_dialog(save).open()
 
     def _open_edit(display_row: dict):
@@ -212,7 +217,7 @@ def entries_tab(vehicle_id: int) -> None:
         def save(data):
             db.update_entry(raw['id'], data)
             ui.notify('Wpis zaktualizowany', type='positive')
-            entries_content.refresh()
+            _refresh_all()
         _entry_dialog(save, raw).open()
 
     def _open_delete(display_row: dict):
@@ -223,7 +228,7 @@ def entries_tab(vehicle_id: int) -> None:
                 def confirm():
                     db.delete_entry(display_row['id'])
                     ui.notify('Wpis usunięty', type='negative')
-                    entries_content.refresh()
+                    _refresh_all()
                     d.close()
                 ui.button('Usuń', on_click=confirm, color='negative')
         d.open()

@@ -71,15 +71,19 @@ def vehicle_detail(vehicle_id: int) -> None:
             tab_docs    = ui.tab('Dokumenty i terminy',  icon='assignment')
             tab_fuel    = ui.tab('Energia / Spalanie',   icon='local_gas_station')
 
+        @ui.refreshable
+        def fuel_stats_content():
+            _fuel_stats_tab(vehicle_id)
+
         with ui.tab_panels(tabs, value=tab_entries).classes('w-full'):
             with ui.tab_panel(tab_entries):
-                entries_tab(vehicle_id)
+                entries_tab(vehicle_id, on_change=fuel_stats_content.refresh)
 
             with ui.tab_panel(tab_docs):
                 documents_tab(vehicle_id)
 
             with ui.tab_panel(tab_fuel):
-                _fuel_stats_tab(vehicle_id)
+                fuel_stats_content()
 
         ui.separator().classes('q-mt-lg')
         with ui.row().classes('q-mt-sm'):
