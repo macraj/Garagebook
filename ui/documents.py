@@ -43,10 +43,10 @@ def documents_tab(vehicle_id: int) -> None:
                 ui.label('Brak danych ubezpieczeniowych.').classes('text-grey-5')
                 return
 
-            for r in records:
-                _insurance_card(r)
+            for i, r in enumerate(records):
+                _insurance_card(r, is_latest=(i == 0))
 
-    def _insurance_card(r: dict) -> None:
+    def _insurance_card(r: dict, *, is_latest: bool = True) -> None:
         days = r.get('days_until')
         with ui.card().classes('w-full'):
             with ui.row().classes('items-center justify-between no-wrap'):
@@ -62,7 +62,10 @@ def documents_tab(vehicle_id: int) -> None:
                     if r.get('notes'):
                         ui.label(r['notes']).classes('text-caption text-grey-5')
                 with ui.row().classes('items-center gap-2 no-wrap'):
-                    ui.badge(alert_label(days), color=alert_color(days))
+                    if not is_latest and days is not None and days <= 0:
+                        ui.badge('zakończona', color='grey')
+                    else:
+                        ui.badge(alert_label(days), color=alert_color(days))
                     ui.button(icon='edit',   on_click=lambda _, rec=r: _open_edit_insurance(rec)).props('flat round dense')
                     ui.button(icon='delete', on_click=lambda _, rec=r: _open_delete_insurance(rec)).props('flat round dense color=negative')
 
@@ -145,10 +148,10 @@ def documents_tab(vehicle_id: int) -> None:
                 ui.label('Brak przeglądów technicznych.').classes('text-grey-5')
                 return
 
-            for r in records:
-                _inspection_card(r)
+            for i, r in enumerate(records):
+                _inspection_card(r, is_latest=(i == 0))
 
-    def _inspection_card(r: dict) -> None:
+    def _inspection_card(r: dict, *, is_latest: bool = True) -> None:
         days = r.get('days_until')
         with ui.card().classes('w-full'):
             with ui.row().classes('items-center justify-between no-wrap'):
@@ -161,7 +164,10 @@ def documents_tab(vehicle_id: int) -> None:
                     if r.get('notes'):
                         ui.label(r['notes']).classes('text-caption text-grey-5')
                 with ui.row().classes('items-center gap-2 no-wrap'):
-                    ui.badge(alert_label(days), color=alert_color(days))
+                    if not is_latest and days is not None and days <= 0:
+                        ui.badge('zakończona', color='grey')
+                    else:
+                        ui.badge(alert_label(days), color=alert_color(days))
                     ui.button(icon='edit',   on_click=lambda _, rec=r: _open_edit_inspection(rec)).props('flat round dense')
                     ui.button(icon='delete', on_click=lambda _, rec=r: _open_delete_inspection(rec)).props('flat round dense color=negative')
 
