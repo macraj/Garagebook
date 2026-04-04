@@ -134,6 +134,95 @@ def _fuel_stats_tab(vehicle_id: int) -> None:
                     ui.label(f'{s["total"]:,.2f} {cur}'.replace(',', '\u202f')).classes('text-h6')
                     ui.label(f'{s["category"]} ({s["count"]} wpisów)').classes('text-caption text-grey-6')
 
+        # ── Struktura kosztów (donut chart) ─────────────────────────────
+        if summary:
+            COLOR_MAP = {
+                'Paliwo': '#4caf50', 'Ładowanie': '#7e57c2', 'Części': '#2196f3',
+                'Obsługa': '#009688', 'Usterka': '#f44336', 'Serwis': '#ff9800',
+                'Ubezpieczenia': '#00bcd4', 'Przeglądy': '#cddc39',
+            }
+            pie_data = [{'name': s['category'], 'value': round(s['total'], 2)} for s in summary]
+            if vstats['cost_insurance']:
+                pie_data.append({'name': 'Ubezpieczenia', 'value': round(vstats['cost_insurance'], 2)})
+            if vstats['cost_inspection']:
+                pie_data.append({'name': 'Przeglądy', 'value': round(vstats['cost_inspection'], 2)})
+
+            ui.label('Struktura kosztów').classes('text-subtitle1 text-grey-7')
+            ui.echart({
+                'tooltip': {'trigger': 'item', 'formatter': '{b}: {c} ' + cur + ' ({d}%)'},
+                'series': [{
+                    'type': 'pie',
+                    'radius': ['40%', '70%'],
+                    'data': pie_data,
+                    'itemStyle': {'borderRadius': 6, 'borderColor': '#fff', 'borderWidth': 2},
+                    'label': {'formatter': '{b}\n{d}%'},
+                    'color': [COLOR_MAP.get(d['name'], '#9e9e9e') for d in pie_data],
+                }],
+            }).classes('w-full h-64')
+
+        ui.separator()
+
+        # ── Koszty i przebieg w czasie ──────────────────────────────────
+        monthly = db.get_monthly_stats(vehicle_id)
+        if monthly:
+            view_state = {'mode': 'month'}
+
+            @ui.refreshable
+            def timeline_chart():
+                mode = view_state['mode']
+                if mode == 'year':
+                    # aggregate by year
+                    yearly: dict[str, dict] = {}
+                    for m in monthly:
+                        y = m['month'][:4]
+                        if y not in yearly:
+                            yearly[y] = {'total_cost': 0, 'km_driven': 0}
+                        yearly[y]['total_cost'] += m['total_cost']
+                        if m['km_driven']:
+                            yearly[y]['km_driven'] += m['km_driven']
+                    labels = list(yearly.keys())
+                    costs = [round(yearly[y]['total_cost'], 2) for y in labels]
+                    kms = [yearly[y]['km_driven'] or None for y in labels]
+                else:
+                    labels = [m['month'] for m in monthly]
+                    costs = [round(m['total_cost'], 2) for m in monthly]
+                    kms = [m['km_driven'] for m in monthly]
+
+                series = [
+                    {'name': f'Koszt ({cur})', 'type': 'bar', 'data': costs,
+                     'itemStyle': {'color': '#5c6bc0', 'borderRadius': [4, 4, 0, 0]}},
+                ]
+                y_axes = [{'type': 'value', 'name': cur}]
+
+                if any(k for k in kms):
+                    series.append({
+                        'name': 'Przebieg (km)', 'type': 'line', 'yAxisIndex': 1,
+                        'data': kms, 'smooth': True,
+                        'itemStyle': {'color': '#ab47bc'},
+                    })
+                    y_axes.append({'type': 'value', 'name': 'km', 'position': 'right'})
+
+                ui.echart({
+                    'tooltip': {'trigger': 'axis'},
+                    'legend': {'data': [s['name'] for s in series], 'bottom': 0},
+                    'xAxis': {
+                        'type': 'category', 'data': labels,
+                        'axisLabel': {'rotate': 30, 'fontSize': 11},
+                    },
+                    'yAxis': y_axes,
+                    'series': series,
+                    'grid': {'left': '8%', 'right': '8%', 'bottom': '18%'},
+                }).classes('w-full h-64')
+
+            ui.label('Koszty i przebieg w czasie').classes('text-subtitle1 text-grey-7')
+            with ui.row().classes('gap-2 q-mb-sm'):
+                def set_mode(m):
+                    view_state['mode'] = m
+                    timeline_chart.refresh()
+                ui.button('Miesięcznie', on_click=lambda: set_mode('month')).props('outline dense')
+                ui.button('Rocznie', on_click=lambda: set_mode('year')).props('outline dense')
+            timeline_chart()
+
         ui.separator()
 
         # ── Zużycie paliwa (L) i ładowanie (kWh) ──────────────────────────

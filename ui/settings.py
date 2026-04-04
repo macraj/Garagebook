@@ -4,7 +4,7 @@ import tomllib
 from pathlib import Path
 from nicegui import ui
 from db import database as db
-from ui.layout import page_header
+from ui.layout import page_header, apply_dark_mode
 
 
 def _get_version() -> str:
@@ -51,6 +51,22 @@ def settings_page() -> None:
             ui.notify(f'Waluta zmieniona na {currency_select.value}', type='positive')
 
         ui.button('Zapisz', icon='save', on_click=save_currency, color='primary')
+
+        ui.separator().classes('q-my-sm')
+
+        # ── Tryb ciemny ────────────────────────────────────────────────────
+        ui.label('Wygląd').classes('text-h5')
+        ui.separator()
+
+        dark_enabled = db.get_setting('dark_mode', '0') == '1'
+
+        def toggle_dark(e):
+            val = '1' if e.value else '0'
+            db.set_setting('dark_mode', val)
+            apply_dark_mode()
+            ui.notify('Tryb ciemny ' + ('włączony' if e.value else 'wyłączony'), type='positive')
+
+        ui.switch('Tryb ciemny', value=dark_enabled, on_change=toggle_dark)
 
         ui.separator().classes('q-my-sm')
 

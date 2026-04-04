@@ -388,6 +388,68 @@ def get_dashboard_data() -> list[dict]:
     return vehicles
 
 
+# ─── Fleet summary ───────────────────────────────────────────────────────────
+
+def get_fleet_summary() -> dict:
+    """Aggregate stats across all vehicles for the dashboard."""
+    with get_connection() as conn:
+        vehicle_count = conn.execute('SELECT COUNT(*) AS c FROM vehicles').fetchone()['c']
+        entries_total = conn.execute('SELECT COALESCE(SUM(amount),0) AS t FROM cost_entries').fetchone()['t']
+        insurance_total = conn.execute('SELECT COALESCE(SUM(cost),0) AS t FROM insurance').fetchone()['t']
+        inspection_total = conn.execute('SELECT COALESCE(SUM(cost),0) AS t FROM technical_inspection').fetchone()['t']
+
+        now = date_type.today()
+        current_month = now.strftime('%Y-%m')
+        month_entries = conn.execute(
+            "SELECT COALESCE(SUM(amount),0) AS t FROM cost_entries WHERE strftime('%Y-%m', date) = ?",
+            (current_month,),
+        ).fetchone()['t']
+        month_insurance = conn.execute(
+            "SELECT COALESCE(SUM(cost),0) AS t FROM insurance WHERE strftime('%Y-%m', date_from) = ?",
+            (current_month,),
+        ).fetchone()['t']
+        month_inspection = conn.execute(
+            "SELECT COALESCE(SUM(cost),0) AS t FROM technical_inspection WHERE strftime('%Y-%m', date) = ?",
+            (current_month,),
+        ).fetchone()['t']
+
+    return {
+        'vehicle_count': vehicle_count,
+        'total_cost': entries_total + insurance_total + inspection_total,
+        'cost_this_month': month_entries + month_insurance + month_inspection,
+    }
+
+
+def get_monthly_stats(vehicle_id: int) -> list[dict]:
+    """Monthly cost + km per month for a single vehicle."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT strftime('%Y-%m', date) AS month,
+                      SUM(amount) AS total_cost,
+                      MAX(odometer) AS max_odo,
+                      MIN(odometer) AS min_odo
+               FROM cost_entries
+               WHERE vehicle_id = ?
+               GROUP BY month
+               ORDER BY month""",
+            (vehicle_id,),
+        ).fetchall()
+        results = []
+        prev_max = None
+        for r in rows:
+            km = None
+            if prev_max is not None and r['max_odo'] and r['max_odo'] > prev_max:
+                km = r['max_odo'] - prev_max
+            if r['max_odo']:
+                prev_max = r['max_odo']
+            results.append({
+                'month': r['month'],
+                'total_cost': r['total_cost'] or 0,
+                'km_driven': km,
+            })
+        return results
+
+
 # ─── Backup / Restore ────────────────────────────────────────────────────────
 
 def backup_db() -> Path:
