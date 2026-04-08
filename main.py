@@ -326,4 +326,5 @@ if __name__ in {'__main__', '__mp_main__'}:
         title='Garagebook',
         window_size=(1280, 820),
         reload=False,
+        reconnect_timeout=5,
     )
