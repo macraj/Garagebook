@@ -1,8 +1,9 @@
 import platform
 import subprocess
+import tempfile
 import tomllib
 from pathlib import Path
-from nicegui import ui
+from nicegui import ui, events
 from db import database as db
 from ui.layout import page_header, apply_dark_mode
 
@@ -135,6 +136,52 @@ def settings_page() -> None:
                             ],
                         ).props('flat dense color=red size=sm').tooltip('Usuń')
 
+        # ── Dialog importu pliku ────────────────────────────────────────────
+        import_state: dict = {'tmp_path': None, 'filename': ''}
+
+        with ui.dialog() as import_confirm_dialog, ui.card().classes('max-w-md'):
+            ui.label('Importuj bazę danych?').classes('text-lg text-bold')
+            import_info = ui.label('').classes('text-body2 text-grey-8 q-mt-xs')
+            ui.label(
+                'UWAGA: Bieżące dane zostaną nadpisane wybranym plikiem. '
+                'Operacji nie można cofnąć.'
+            ).classes('text-body2 text-red q-mt-sm')
+            with ui.row().classes('justify-end gap-2 q-mt-md'):
+                ui.button('Anuluj', on_click=import_confirm_dialog.close).props('flat')
+
+                def do_import():
+                    try:
+                        if import_state['tmp_path']:
+                            db.restore_db(Path(import_state['tmp_path']))
+                        import_confirm_dialog.close()
+                        ui.notify('Baza danych zaimportowana. Przekierowuję...', type='positive')
+                        ui.navigate.to('/')
+                    except Exception as ex:
+                        ui.notify(f'Błąd importu: {ex}', type='negative')
+
+                ui.button('Importuj', icon='file_upload', on_click=do_import).props('color=red')
+
+        with ui.dialog() as import_upload_dialog, ui.card().classes('max-w-md w-full'):
+            ui.label('Wybierz plik bazy danych').classes('text-lg text-bold')
+            ui.label('Akceptowane pliki: .db').classes('text-caption text-grey-6')
+
+            def handle_upload(e: events.UploadEventArguments):
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.db') as tmp:
+                    tmp.write(e.content.read())
+                    import_state['tmp_path'] = tmp.name
+                    import_state['filename'] = e.name
+                import_upload_dialog.close()
+                import_info.set_text(f'Plik: {e.name}')
+                import_confirm_dialog.open()
+
+            ui.upload(
+                label='Przeciągnij plik lub kliknij',
+                on_upload=handle_upload,
+                max_files=1,
+            ).props('accept=".db" flat').classes('w-full')
+            with ui.row().classes('justify-end q-mt-sm'):
+                ui.button('Anuluj', on_click=import_upload_dialog.close).props('flat')
+
         # ── Przyciski akcji ─────────────────────────────────────────────────
         with ui.row().classes('gap-2 q-mb-sm'):
             def make_backup():
@@ -146,6 +193,11 @@ def settings_page() -> None:
                     ui.notify(f'Błąd tworzenia backupu: {ex}', type='negative')
 
             ui.button('Utwórz backup', icon='backup', on_click=make_backup, color='primary')
+            ui.button(
+                'Importuj z pliku',
+                icon='file_upload',
+                on_click=import_upload_dialog.open,
+            ).props('flat color=orange')
             ui.button(
                 'Otwórz folder backupów',
                 icon='folder_open',
